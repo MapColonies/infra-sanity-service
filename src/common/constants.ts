@@ -12,5 +12,7 @@ export const SERVICES = {
   CONFIG: Symbol('Config'),
   TRACER: Symbol('Tracer'),
   METRICS: Symbol('METRICS'),
+  ROUTE_API: Symbol('ROUTE_API'),
+  APPS_API: Symbol('APPS_API'),
 } satisfies Record<string, symbol>;
 /* eslint-enable @typescript-eslint/naming-convention */

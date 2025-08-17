@@ -1,124 +1,68 @@
-# Map Colonies typescript service template
+# Infra Sanity Service
 
-----------------------------------
+Infra Sanity Service is a Node.js/TypeScript web service for infrastructure observability and validation in Kubernetes and OpenShift environments. It exposes a REST API for checking Prometheus metrics annotations on workloads and validating TLS certificates on OpenShift routes.
 
-This is a basic repo template for building new MapColonies web services in Typescript.
+## Features
 
-> [!IMPORTANT]
-> To regenerate the types on openapi change run the command `npm run generate:openapi-types`.
+- Check Kubernetes Deployments and StatefulSets for Prometheus metrics annotations
+- Validate TLS certificates for OpenShift routes, including certificate details and match status
+- OpenAPI request validation and documentation
+- Structured logging and metrics
+- Configurable via environment and config files
 
-> [!WARNING]
-> After creating a new repo based on this template, you should delete the CODEOWNERS file.
+## API Endpoints
 
+See the full OpenAPI spec [here](./openapi3.yaml).
+
+### `GET /metrics-annotations`
+Checks Deployments and StatefulSets in specified namespaces for Prometheus metrics annotations. Returns details about annotation presence and values.
+
+**Query Parameters:**
+- `namespaces` (array, required): List of namespaces to check
+- `labelSelector` (string, optional): Label selector to filter workloads
+
+### `GET /validate-certs`
+Validates TLS certificates for OpenShift routes in specified namespaces. Returns certificate details and validation status (host and key match).
+
+**Query Parameters:**
+- `namespaces` (array, required): List of namespaces to check
+- `labelSelector` (string, optional): Label selector to filter routes
+- `filterNoCert` (boolean, optional): Filter out routes without certificates
+
+## Getting Started
+
+### Installation
+
+```bash
+npm install
+```
+
+### Running the Service
+
+```bash
+npm run start:dev   # Development mode (with source maps, config offline)
+npm run start       # Production mode
+```
+
+### Configuration
+
+Configuration is managed via the `config/` directory and environment variables. See `config/default.json` for options.
+
+### Running Tests
+
+```bash
+npm run test           # Run all tests
+npm run test:unit      # Run unit tests only
+npm run test:integration # Run integration tests only
+```
 
 ## Development
-When in development you should use the command `npm run start:dev`. The main benefits are that it enables offline mode for the config package, and source map support for NodeJS errors.
 
-### Template Features:
+- Uses ESLint, Prettier, and commitlint for code quality
+- Multi-stage Dockerfile for production builds
+- Tracing and metrics via [@map-colonies/telemetry](https://github.com/MapColonies/telemetry)
+- Logging via [@map-colonies/js-logger](https://github.com/MapColonies/js-logger)
 
-- eslint configuration by [@map-colonies/eslint-config](https://github.com/MapColonies/eslint-config)
+## License
 
-- prettier configuration by [@map-colonies/prettier-config](https://github.com/MapColonies/prettier-config)
-
-- jest
-
-- .nvmrc
-
-- Multi stage production-ready Dockerfile
-
-- commitlint
-
-- git hooks
-
-- logging by [@map-colonies/js-logger](https://github.com/MapColonies/js-logger)
-
-- OpenAPI request validation
-
-- config load with [node-config](https://www.npmjs.com/package/node-config)
-
-- Tracing and metrics by [@map-colonies/telemetry](https://github.com/MapColonies/telemetry)
-
-- github templates
-
-- bug report
-
-- feature request
-
-- pull request
-
-- github actions
-
-- on pull_request
-
-- LGTM
-
-- test
-
-- lint
-
-- snyk
-
-## API
-Checkout the OpenAPI spec [here](/openapi3.yaml)
-
-## Installation
-
-Install deps with npm
-
-```bash
-npm install
-```
-
-## Run Locally
-
-Clone the project
-
-```bash
-
-git clone https://link-to-project
-
-```
-
-Go to the project directory
-
-```bash
-
-cd my-project
-
-```
-
-Install dependencies
-
-```bash
-
-npm install
-
-```
-
-Start the server
-
-```bash
-
-npm run start
-
-```
-
-## Running Tests
-
-To run tests, run the following command
-
-```bash
-
-npm run test
-
-```
-
-To only run unit tests:
-```bash
-npm run test:unit
-```
-
-To only run integration tests:
-```bash
-npm run test:integration
-```
+MIT

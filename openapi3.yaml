@@ -1,68 +1,88 @@
 openapi: 3.0.1
 info:
-  title: service-name
-  description: basic template for map colonies service
+  title: infra-sanity-service
+  description: This is a service for infrastructure sanity checks
   version: 1.0.0
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
 paths:
-  /anotherResource:
+  /metrics-annotations:
     get:
-      operationId: getAnotherResource
+      operationId: getMetricsAnnotations
       tags:
-        - anotherResource
-      summary: gets the resource
+        - monitoring
+      summary: Check if Kubernetes workloads have Prometheus metrics annotations
+      description: |
+        Returns, for each Deployment or StatefulSet in the specified namespaces, whether Prometheus metrics annotations are present. If present, includes annotation details (scrapeEnabled, port, path).
+      parameters:
+        - name: namespaces
+          in: query
+          required: true
+          description: List of namespaces
+          schema:
+            type: array
+            items:
+              type: string
+        - name: labelSelector
+          in: query
+          required: false
+          description: Label selector to filter workloads
+          schema:
+            type: string
       responses:
         200:
-          description: OK
+          description: List of workload metrics info
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/anotherResource'
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkloadMetricsInfo'
         400:
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-  /resourceName:
+  /validate-certs:
     get:
-      operationId: getResourceName
+      operationId: getRouteCerts
       tags:
-        - resourceName
-      summary: gets the resource
+        - route
+      summary: Validate TLS certificates for OpenShift routes
+      description: |
+        Returns, for each OpenShift route in the specified namespaces, details about its TLS certificate and validation status. Includes certificate subject, issuer, validity dates, and whether the host and private key match the certificate.
+      parameters:
+        - name: namespaces
+          in: query
+          required: true
+          description: List of namespaces
+          schema:
+            type: array
+            items:
+              type: string
+        - name: labelSelector
+          in: query
+          required: false
+          description: Label selector to filter routes
+          schema:
+            type: string
+        - name: filterNoCert
+          in: query
+          required: false
+          description: Filter out routes without certificates
+          schema:
+            type: boolean
       responses:
         200:
-          description: OK
+          description: List of route info with certificate validation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/resource'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-    post:
-      operationId: createResource
-      tags:
-        - resourceName
-      summary: creates a new record of type resource
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/resource'
-      responses:
-        201:
-          description: created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/resource'
+                type: array
+                items:
+                  $ref: '#/components/schemas/RouteInfo'
         400:
           description: Bad Request
           content:
@@ -80,27 +100,94 @@ components:
       properties:
         message:
           type: string
-    resource:
+    WorkloadMetricsInfo:
       type: object
       required:
-        - id
         - name
-        - description
+        - namespace
+        - type
       properties:
-        id:
-          type: number
-          format: int64
         name:
           type: string
-        description:
+        namespace:
           type: string
-    anotherResource:
+        type:
+          type: string
+          enum: [Deployment, StatefulSet]
+        replicas:
+          type: integer
+        readyReplicas:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        metricsAnnotations:
+          $ref: '#/components/schemas/MetricsAnnotations'
+    MetricsAnnotations:
+      type: object
+      properties:
+        scrapeEnabled:
+          type: boolean
+        port:
+          type: string
+        path:
+          type: string
+    RouteInfo:
       type: object
       required:
-        - kind
-        - isAlive
+        - name
+        - namespace
+        - host
+        - service
       properties:
-        kind:
+        name:
           type: string
-        isAlive:
+        namespace:
+          type: string
+        host:
+          type: string
+        path:
+          type: string
+        service:
+          type: string
+        port:
+          type: string
+        tls:
+          $ref: '#/components/schemas/RouteTlsInfo'
+    RouteTlsInfo:
+      type: object
+      properties:
+        termination:
+          type: string
+        certificateInfo:
+          $ref: '#/components/schemas/CertificateInfo'
+        hostMatchesCertificate:
           type: boolean
+        privateKeyMatchesCertificate:
+          type: boolean
+    CertificateInfo:
+      type: object
+      required:
+        - subject
+        - issuer
+        - validFrom
+        - validTo
+        - serialNumber
+        - fingerprint
+      properties:
+        subject:
+          type: string
+        issuer:
+          type: string
+        validFrom:
+          type: string
+        validTo:
+          type: string
+        serialNumber:
+          type: string
+        fingerprint:
+          type: string
+        subjectAltNames:
+          type: array
+          items:
+            type: string
