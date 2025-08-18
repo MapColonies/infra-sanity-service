@@ -1,6 +1,6 @@
 {{- $releaseName := .Release.Name -}}
-{{- $chartName := include "infra-sanity-ervice.name" . -}}
-{{- $cloudProviderFlavor := include "infra-sanity-ervice.cloudProviderFlavor" . -}}
+{{- $chartName := include "infra-sanity-service.name" . -}}
+{{- $cloudProviderFlavor := include "infra-sanity-service.cloudProviderFlavor" . -}}
 {{- if and (and (.Values.enabled) (eq $cloudProviderFlavor "openshift")) (.Values.route.enabled) -}}
 apiVersion: route.openshift.io/v1
 kind: Route
@@ -20,7 +20,7 @@ spec:
   path: {{ .Values.route.path | default "/" }}
   to:
     kind: Service
-    name: {{ printf "%s-service" (include "infra-sanity-ervice.fullname" .) }}
+    name: {{ printf "%s-service" (include "infra-sanity-service.fullname" .) }}
   {{- if .Values.route.tls.enabled }}
   tls:
     termination: {{ .Values.route.tls.termination | quote }}

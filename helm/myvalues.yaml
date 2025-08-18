@@ -4,21 +4,9 @@ global:
   metrics: {}
   environment: ''
 
-enabled: true
-environment: development
-replicaCount: 1
-revisionHistoryLimit: 5  # Amount of revisions we keep
-nodePort: 30030  # for minikube deployment only
-resetOnConfigChange: false
-
-nameOverride: ""
-fullnameOverride: ""
-
 configManagement:
-  offlineMode: false
-  name: 'service-name'
-  version: 'latest'
-  serverUrl: 'http://localhost:8080/api'
+  offlineMode: true
+
 
 livenessProbe:
   enabled: true
@@ -50,8 +38,8 @@ args: []
 sidecars: []
 
 cloudProvider:
-  dockerRegistryUrl: ''
-  imagePullSecretName: ''
+  dockerRegistryUrl: acrarolibotnonprod.azurecr.io
+  imagePullSecretName: 'acr-registry'
   flavor: openshift
 
 caSecretName: ''
@@ -59,9 +47,9 @@ caPath: '/usr/local/share/ca-certificates'
 caKey: 'ca.crt'
 
 image:
-  repository: infra/infra-sanity-service
+  # repository: infra-sanity-service
   # If commented, appVersion will be taken. See: _helpers.tpl
-  # tag: 'latest'
+  tag: '0.1.0'
   pullPolicy: IfNotPresent
 
 env:
@@ -115,4 +103,4 @@ ingress:
     origin: '*'
 
 serviceAccount:
-  name: ""
+  name: "sanity-service"

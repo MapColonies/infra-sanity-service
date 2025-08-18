@@ -1,20 +1,20 @@
 {{- $releaseName := .Release.Name -}}
-{{- $chartName := include "infra-sanity-ervice.name" . -}}
-{{- $cloudProviderFlavor := include "infra-sanity-ervice.cloudProviderFlavor" . -}}
-{{- $cloudProviderDockerRegistryUrl := include "infra-sanity-ervice.cloudProviderDockerRegistryUrl" . -}}
-{{- $cloudProviderImagePullSecretName := include "infra-sanity-ervice.cloudProviderImagePullSecretName" . -}}
-{{- $imageTag := include "infra-sanity-ervice.tag" . -}}
+{{- $chartName := include "infra-sanity-service.name" . -}}
+{{- $cloudProviderFlavor := include "infra-sanity-service.cloudProviderFlavor" . -}}
+{{- $cloudProviderDockerRegistryUrl := include "infra-sanity-service.cloudProviderDockerRegistryUrl" . -}}
+{{- $cloudProviderImagePullSecretName := include "infra-sanity-service.cloudProviderImagePullSecretName" . -}}
+{{- $imageTag := include "infra-sanity-service.tag" . -}}
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ printf "%s-deployment" (include "infra-sanity-ervice.fullname" .) }}
+  name: {{ printf "%s-deployment" (include "infra-sanity-service.fullname" .) }}
   labels:
     app: {{ $chartName }}
     component: {{ $chartName }}
-    environment: {{ include "infra-sanity-ervice.environment" . }}
+    environment: {{ include "infra-sanity-service.environment" . }}
     release: {{ $releaseName }}
-    {{- include "infra-sanity-ervice.labels" . | nindent 4 }}
+    {{- include "infra-sanity-service.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
@@ -23,14 +23,14 @@ spec:
       app: {{ $chartName }}
       release: {{ $releaseName }}
       run: {{ $releaseName }}-{{ $chartName }}
-      {{- include "infra-sanity-ervice.selectorLabels" . | nindent 6 }}
+      {{- include "infra-sanity-service.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         app: {{ $chartName }}
         release: {{ $releaseName }}
         run: {{ $releaseName }}-{{ $chartName }}
-        {{- include "infra-sanity-ervice.labels" . | nindent 8 }}
+        {{- include "infra-sanity-service.labels" . | nindent 8 }}
       annotations:
       {{- if .Values.resetOnConfigChange }}
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
@@ -43,6 +43,7 @@ spec:
       imagePullSecrets:
         - name: {{ $cloudProviderImagePullSecretName | quote }}
     {{- end }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
@@ -80,7 +81,7 @@ spec:
             {{- end }}            
           envFrom:
             - configMapRef:
-                name: {{ printf "%s-configmap" (include "infra-sanity-ervice.fullname" .) }}
+                name: {{ printf "%s-configmap" (include "infra-sanity-service.fullname" .) }}
           ports:
             - name: http
               containerPort: {{ .Values.env.targetPort }}
