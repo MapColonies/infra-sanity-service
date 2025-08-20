@@ -22,6 +22,7 @@ paths:
           description: List of namespaces
           schema:
             type: array
+            minLength: 1
             items:
               type: string
         - name: labelSelector
@@ -45,6 +46,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
   /validate-certs:
     get:
       operationId: getRouteCerts
@@ -60,6 +67,7 @@ paths:
           description: List of namespaces
           schema:
             type: array
+            minLength: 1
             items:
               type: string
         - name: labelSelector
@@ -89,6 +97,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
 security:
   - {}
 components:
@@ -106,6 +120,7 @@ components:
         - name
         - namespace
         - type
+        - hasMetricsAnnotations
       properties:
         name:
           type: string
@@ -121,6 +136,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        hasMetricsAnnotations:
+          type: boolean
         metricsAnnotations:
           $ref: '#/components/schemas/MetricsAnnotations'
     MetricsAnnotations:

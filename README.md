@@ -63,6 +63,52 @@ npm run test:integration # Run integration tests only
 - Tracing and metrics via [@map-colonies/telemetry](https://github.com/MapColonies/telemetry)
 - Logging via [@map-colonies/js-logger](https://github.com/MapColonies/js-logger)
 
+## Example: Kubernetes RBAC for Infra Sanity Service
+
+To allow Infra Sanity Service to read Deployments, StatefulSets, and OpenShift Routes, create the following RBAC resources. This grants only 'get' and 'list' permissions for these resources, following the principle of least privilege for observability and validation use cases.
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sanity-service
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sanity-service
+  namespace: default
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets"]
+    verbs: ["get", "list"]
+  - apiGroups: ["route.openshift.io"]
+    resources: ["routes"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sanity-service-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: sanity-service
+    namespace: default
+roleRef:
+  kind: Role
+  name: sanity-service
+  apiGroup: rbac.authorization.k8s.io
+```
+
+**Explanation:**
+- The ServiceAccount is used by the Infra Sanity Service pod.
+- The Role grants read-only access to Deployments, StatefulSets, and Routes.
+- The RoleBinding attaches the Role to the ServiceAccount in the target namespace.
+
+Apply these manifests to your cluster to enable secure, scoped access for the service.
+
 ## License
 
 MIT

@@ -59,6 +59,7 @@ export type components = {
       readyReplicas?: number;
       /** Format: date-time */
       createdAt?: string;
+      hasMetricsAnnotations: boolean;
       metricsAnnotations?: components['schemas']['MetricsAnnotations'];
     };
     MetricsAnnotations: {
@@ -131,6 +132,15 @@ export interface operations {
           'application/json': components['schemas']['error'];
         };
       };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['error'];
+        };
+      };
     };
   };
   getRouteCerts: {
@@ -160,6 +170,15 @@ export interface operations {
       };
       /** @description Bad Request */
       400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['error'];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
         headers: {
           [name: string]: unknown;
         };

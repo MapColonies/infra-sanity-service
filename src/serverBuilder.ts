@@ -45,11 +45,6 @@ export class ServerBuilder {
   }
 
   private buildRoutes(): void {
-    this.serverInstance.use('/', (req, res, next) => {
-      console.log(req.url);
-      next();
-    });
-
     this.serverInstance.use('/', this.router);
     this.buildDocsRoutes();
   }

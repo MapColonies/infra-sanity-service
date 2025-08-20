@@ -26,26 +26,33 @@ export class KubernetesWorkloadRetriever {
       this.logger.debug({ count: deployments.length }, `Found ${deployments.length} deployments in namespace ${namespace}`);
       this.logger.debug({ count: statefulSets.length }, `Found ${statefulSets.length} stateful sets in namespace ${namespace}`);
 
-      const deploymentWorkloads = deployments.map((deployment) => ({
-        name: deployment.metadata?.name ?? '',
-        namespace: deployment.metadata?.namespace ?? '',
-        type: 'Deployment' as const,
-        replicas: deployment.spec?.replicas,
-        readyReplicas: deployment.status?.readyReplicas,
-        createdAt: deployment.metadata?.creationTimestamp?.toISOString(),
-        metricsAnnotations: this.extractMetricsAnnotations(deployment.spec?.template.metadata?.annotations),
-      }));
+      const deploymentWorkloads = deployments.map((deployment): WorkloadMetricsInfo => {
+        const metricsAnnotations = this.extractMetricsAnnotations(deployment.spec?.template.metadata?.annotations);
+        return {
+          name: deployment.metadata?.name ?? '',
+          namespace: deployment.metadata?.namespace ?? '',
+          type: 'Deployment' as const,
+          replicas: deployment.spec?.replicas,
+          readyReplicas: deployment.status?.readyReplicas,
+          createdAt: deployment.metadata?.creationTimestamp?.toISOString(),
+          hasMetricsAnnotations: metricsAnnotations.scrapeEnabled !== undefined,
+          metricsAnnotations,
+        };
+      });
 
-      const statefulSetWorkloads = statefulSets.map((statefulSet) => ({
-        name: statefulSet.metadata?.name ?? '',
-        namespace: statefulSet.metadata?.namespace ?? '',
-        type: 'StatefulSet' as const,
-        replicas: statefulSet.spec?.replicas,
-        readyReplicas: statefulSet.status?.readyReplicas,
-        createdAt: statefulSet.metadata?.creationTimestamp?.toISOString(),
-        metricsAnnotations: this.extractMetricsAnnotations(statefulSet.spec?.template.metadata?.annotations),
-      }));
-
+      const statefulSetWorkloads = statefulSets.map((statefulSet): WorkloadMetricsInfo => {
+        const metricsAnnotations = this.extractMetricsAnnotations(statefulSet.spec?.template.metadata?.annotations);
+        return {
+          name: statefulSet.metadata?.name ?? '',
+          namespace: statefulSet.metadata?.namespace ?? '',
+          type: 'StatefulSet' as const,
+          replicas: statefulSet.spec?.replicas,
+          readyReplicas: statefulSet.status?.readyReplicas,
+          createdAt: statefulSet.metadata?.creationTimestamp?.toISOString(),
+          hasMetricsAnnotations: metricsAnnotations.scrapeEnabled !== undefined,
+          metricsAnnotations,
+        };
+      });
       allWorkloads.push(...deploymentWorkloads, ...statefulSetWorkloads);
     }
 
