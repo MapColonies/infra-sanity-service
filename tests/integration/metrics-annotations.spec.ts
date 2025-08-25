@@ -3,13 +3,11 @@ import jsLogger from '@map-colonies/js-logger';
 import { trace } from '@opentelemetry/api';
 import httpStatusCodes from 'http-status-codes';
 import { createRequestSender, RequestSender } from '@map-colonies/openapi-helpers/requestSender';
-import { AppsV1Api, CustomObjectsApi } from '@kubernetes/client-node';
+import { AppsV1Api } from '@kubernetes/client-node';
 import { paths, operations } from '@openapi';
-import { CertResult, generateCerts } from '@tests/utils/generate-certs';
 import { getApp } from '@src/app';
 import { SERVICES } from '@common/constants';
 import { initConfig } from '@src/common/config';
-import { generateRoute } from '@tests/utils/generate-route';
 import { generateMockDeployment, generateMockStatefulSet } from '@tests/utils/generate-workload';
 
 describe('metrics-annotations', function () {

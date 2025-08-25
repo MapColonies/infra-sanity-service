@@ -1,10 +1,5 @@
 import * as k8s from '@kubernetes/client-node';
 
-export interface KubernetesClientOptions {
-  readonly token?: string;
-  readonly server?: string;
-}
-
 /**
  * Creates and configures a Kubernetes client
  */

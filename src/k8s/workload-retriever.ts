@@ -60,14 +60,14 @@ export class KubernetesWorkloadRetriever {
     return allWorkloads;
   }
 
-  public async getDeployments(namespace: string, labelSelector?: string): Promise<V1Deployment[]> {
+  private async getDeployments(namespace: string, labelSelector?: string): Promise<V1Deployment[]> {
     this.logger.debug({ namespace, labelSelector }, 'Listing deployments');
     const response = await this.kubeClient.listNamespacedDeployment({ namespace, labelSelector });
     this.logger.debug({ count: response.items.length }, `Deployments fetched for namespace ${namespace}`);
     return response.items;
   }
 
-  public async getStatefulSets(namespace: string, labelSelector?: string): Promise<V1StatefulSet[]> {
+  private async getStatefulSets(namespace: string, labelSelector?: string): Promise<V1StatefulSet[]> {
     this.logger.debug({ namespace, labelSelector }, 'Listing stateful sets');
     const response = await this.kubeClient.listNamespacedStatefulSet({ namespace, labelSelector });
     this.logger.debug({ count: response.items.length }, `Stateful sets fetched for namespace ${namespace}`);
