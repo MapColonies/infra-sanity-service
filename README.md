@@ -27,7 +27,6 @@ Validates TLS certificates for OpenShift routes in specified namespaces. Returns
 **Query Parameters:**
 - `namespaces` (array, required): List of namespaces to check
 - `labelSelector` (string, optional): Label selector to filter routes
-- `filterNoCert` (boolean, optional): Filter out routes without certificates
 
 ## Getting Started
 
