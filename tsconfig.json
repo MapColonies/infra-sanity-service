@@ -9,6 +9,6 @@
       "@openapi": ["src/openapi"]
     }
   },
-  "include": ["src", "tests", "src/controllers/controller.ts"],
+  "include": ["src", "tests"],
   "exclude": ["node_modules", "dist"]
 }

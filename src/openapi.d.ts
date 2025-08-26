@@ -150,8 +150,6 @@ export interface operations {
         namespaces: string[];
         /** @description Label selector to filter routes */
         labelSelector?: string;
-        /** @description Filter out routes without certificates */
-        filterNoCert?: boolean;
       };
       header?: never;
       path?: never;

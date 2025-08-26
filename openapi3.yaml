@@ -76,12 +76,6 @@ paths:
           description: Label selector to filter routes
           schema:
             type: string
-        - name: filterNoCert
-          in: query
-          required: false
-          description: Filter out routes without certificates
-          schema:
-            type: boolean
       responses:
         200:
           description: List of route info with certificate validation
