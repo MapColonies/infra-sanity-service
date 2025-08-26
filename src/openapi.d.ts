@@ -1,15 +1,19 @@
 /* eslint-disable */
 import type { TypedRequestHandlers as ImportedTypedRequestHandlers } from '@map-colonies/openapi-helpers/typedRequestHandler';
 export type paths = {
-  '/anotherResource': {
+  '/metrics-annotations': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** gets the resource */
-    get: operations['getAnotherResource'];
+    /**
+     * Check if Kubernetes workloads have Prometheus metrics annotations
+     * @description Returns, for each Deployment or StatefulSet in the specified namespaces, whether Prometheus metrics annotations are present. If present, includes annotation details (scrapeEnabled, port, path).
+     *
+     */
+    get: operations['getMetricsAnnotations'];
     put?: never;
     post?: never;
     delete?: never;
@@ -18,18 +22,21 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
-  '/resourceName': {
+  '/validate-certs': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** gets the resource */
-    get: operations['getResourceName'];
+    /**
+     * Validate TLS certificates for OpenShift routes
+     * @description Returns, for each OpenShift route in the specified namespaces, details about its TLS certificate and validation status. Includes certificate subject, issuer, validity dates, and whether the host and private key match the certificate.
+     *
+     */
+    get: operations['getRouteCerts'];
     put?: never;
-    /** creates a new record of type resource */
-    post: operations['createResource'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -43,15 +50,46 @@ export type components = {
     error: {
       message: string;
     };
-    resource: {
-      /** Format: int64 */
-      id: number;
+    WorkloadMetricsInfo: {
       name: string;
-      description: string;
+      namespace: string;
+      /** @enum {string} */
+      type: 'Deployment' | 'StatefulSet';
+      replicas?: number;
+      readyReplicas?: number;
+      /** Format: date-time */
+      createdAt?: string;
+      hasMetricsAnnotations: boolean;
+      metricsAnnotations?: components['schemas']['MetricsAnnotations'];
     };
-    anotherResource: {
-      kind: string;
-      isAlive: boolean;
+    MetricsAnnotations: {
+      scrapeEnabled?: boolean;
+      port?: string;
+      path?: string;
+    };
+    RouteInfo: {
+      name: string;
+      namespace: string;
+      host: string;
+      path?: string;
+      service: string;
+      port?: string;
+      tls?: components['schemas']['RouteTlsInfo'];
+    };
+    RouteTlsInfo: {
+      termination?: string;
+      certificateInfo?: components['schemas']['CertificateInfo'];
+      hostMatchesCertificate?: boolean;
+      privateKeyMatchesCertificate?: boolean;
+    };
+    CertificateInfo: {
+      subject: string;
+      issuer: string;
+      validFrom: string;
+      validTo: string;
+      serialNumber: string;
+      fingerprint: string;
+      subjectAltNames?: string[];
     };
   };
   responses: never;
@@ -62,70 +100,83 @@ export type components = {
 };
 export type $defs = Record<string, never>;
 export interface operations {
-  getAnotherResource: {
+  getMetricsAnnotations: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description List of namespaces */
+        namespaces: string[];
+        /** @description Label selector to filter workloads */
+        labelSelector?: string;
+      };
       header?: never;
       path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description OK */
+      /** @description List of workload metrics info */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['anotherResource'];
-        };
-      };
-    };
-  };
-  getResourceName: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['resource'];
-        };
-      };
-    };
-  };
-  createResource: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['resource'];
-      };
-    };
-    responses: {
-      /** @description created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['resource'];
+          'application/json': components['schemas']['WorkloadMetricsInfo'][];
         };
       };
       /** @description Bad Request */
       400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['error'];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['error'];
+        };
+      };
+    };
+  };
+  getRouteCerts: {
+    parameters: {
+      query: {
+        /** @description List of namespaces */
+        namespaces: string[];
+        /** @description Label selector to filter routes */
+        labelSelector?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description List of route info with certificate validation */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['RouteInfo'][];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['error'];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
         headers: {
           [name: string]: unknown;
         };
