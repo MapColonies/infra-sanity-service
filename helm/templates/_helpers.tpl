@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "infra-sanity-service.name" -}}
+{{- define "checkmate.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "infra-sanity-service.fullname" -}}
+{{- define "checkmate.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -26,52 +26,43 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "infra-sanity-service.chart" -}}
+{{- define "checkmate.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "infra-sanity-service.labels" -}}
-helm.sh/chart: {{ include "infra-sanity-service.chart" . }}
-{{ include "infra-sanity-service.selectorLabels" . }}
+{{- define "checkmate.labels" -}}
+helm.sh/chart: {{ include "checkmate.chart" . }}
+{{ include "checkmate.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ include "mc-labels-and-annotations.labels" . }}
 {{- end }}
 
 {{/*
 Returns the tag of the chart.
 */}}
-{{- define "infra-sanity-service.tag" -}}
+{{- define "checkmate.tag" -}}
 {{- default (printf "v%s" .Chart.AppVersion) .Values.image.tag }}
 {{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "infra-sanity-service.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "infra-sanity-service.name" . }}
+{{- define "checkmate.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "checkmate.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{ include "mc-labels-and-annotations.selectorLabels" . }}
 {{- end }}
-
-{{/*
-Returns the environment from global if exists or from the chart's values, defaults to development
-*/}}
-{{- define "infra-sanity-service.environment" -}}
-{{- if .Values.global.environment }}
-    {{- .Values.global.environment -}}
-{{- else -}}
-    {{- .Values.environment | default "development" -}}
-{{- end -}}
-{{- end -}}
 
 {{/*
 Returns the cloud provider name from global if exists or from the chart's values, defaults to minikube
 */}}
-{{- define "infra-sanity-service.cloudProviderFlavor" -}}
+{{- define "checkmate.cloudProviderFlavor" -}}
 {{- if .Values.global.cloudProvider.flavor }}
     {{- .Values.global.cloudProvider.flavor -}}
 {{- else if .Values.cloudProvider -}}
@@ -84,7 +75,7 @@ Returns the cloud provider name from global if exists or from the chart's values
 {{/*
 Returns the cloud provider docker registry url from global if exists or from the chart's values
 */}}
-{{- define "infra-sanity-service.cloudProviderDockerRegistryUrl" -}}
+{{- define "checkmate.cloudProviderDockerRegistryUrl" -}}
 {{- if .Values.global.cloudProvider.dockerRegistryUrl }}
     {{- printf "%s/" .Values.global.cloudProvider.dockerRegistryUrl -}}
 {{- else if .Values.cloudProvider.dockerRegistryUrl -}}
@@ -96,7 +87,7 @@ Returns the cloud provider docker registry url from global if exists or from the
 {{/*
 Returns the cloud provider image pull secret name from global if exists or from the chart's values
 */}}
-{{- define "infra-sanity-service.cloudProviderImagePullSecretName" -}}
+{{- define "checkmate.cloudProviderImagePullSecretName" -}}
 {{- if .Values.global.cloudProvider.imagePullSecretName }}
     {{- .Values.global.cloudProvider.imagePullSecretName -}}
 {{- else if .Values.cloudProvider.imagePullSecretName -}}
@@ -107,7 +98,7 @@ Returns the cloud provider image pull secret name from global if exists or from 
 {{/*
 Returns the tracing url from global if exists or from the chart's values
 */}}
-{{- define "infra-sanity-service.tracingUrl" -}}
+{{- define "checkmate.tracingUrl" -}}
 {{- if .Values.global.tracing.url }}
     {{- .Values.global.tracing.url -}}
 {{- else if .Values.cloudProvider -}}
@@ -118,7 +109,7 @@ Returns the tracing url from global if exists or from the chart's values
 {{/*
 Returns the tracing url from global if exists or from the chart's values
 */}}
-{{- define "infra-sanity-service.metricsUrl" -}}
+{{- define "checkmate.metricsUrl" -}}
 {{- if .Values.global.metrics.url }}
     {{- .Values.global.metrics.url -}}
 {{- else -}}

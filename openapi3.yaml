@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: infra-sanity-service
+  title: checkmate
   description: This is a service for infrastructure sanity checks
   version: 1.0.0
   license:

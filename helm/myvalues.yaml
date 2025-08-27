@@ -2,7 +2,6 @@ global:
   cloudProvider: {}
   tracing: {}
   metrics: {}
-  environment: ''
 
 configManagement:
   offlineMode: true
@@ -47,7 +46,7 @@ caPath: '/usr/local/share/ca-certificates'
 caKey: 'ca.crt'
 
 image:
-  # repository: infra-sanity-service
+  # repository: checkmate
   # If commented, appVersion will be taken. See: _helpers.tpl
   tag: '0.1.0'
   pullPolicy: IfNotPresent
@@ -103,4 +102,9 @@ ingress:
     origin: '*'
 
 serviceAccount:
-  name: "sanity-service"
+  create: true
+  name: "checkmate"
+
+rbac:
+  create: true
+  targetNamespaces: []

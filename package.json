@@ -1,5 +1,5 @@
 {
-  "name": "infra-sanity-service",
+  "name": "checkmate",
   "version": "0.1.0",
   "description": "This is a service for infrastructure sanity checks",
   "main": "./src/index.ts",
