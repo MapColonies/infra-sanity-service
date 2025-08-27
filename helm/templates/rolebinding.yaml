@@ -1,6 +1,6 @@
 {{- if and .Values.enabled .Values.rbac.create -}}
 {{- $ := . -}}
-{{- $namespaces := .Values.rbac.targetNamespaces | default (list .Release.Namespace) -}}
+{{- $namespaces := (concat .Values.rbac.targetNamespaces (list .Release.Namespace)) | uniq -}}
 {{- range $namespace := $namespaces }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -15,5 +15,6 @@ roleRef:
   kind: Role
   name: {{ include "checkmate.fullname" $ }}
   apiGroup: rbac.authorization.k8s.io
+---
 {{- end }}
 {{- end }}

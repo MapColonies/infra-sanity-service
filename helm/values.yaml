@@ -19,7 +19,7 @@ fullnameOverride: ""
 
 configManagement:
   offlineMode: false
-  name: 'service-name'
+  name: 'checkmate'
   version: 'latest'
   serverUrl: 'http://localhost:8080/api'
 
