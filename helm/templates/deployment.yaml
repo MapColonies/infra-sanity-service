@@ -1,20 +1,19 @@
 {{- $releaseName := .Release.Name -}}
-{{- $chartName := include "infra-sanity-service.name" . -}}
-{{- $cloudProviderFlavor := include "infra-sanity-service.cloudProviderFlavor" . -}}
-{{- $cloudProviderDockerRegistryUrl := include "infra-sanity-service.cloudProviderDockerRegistryUrl" . -}}
-{{- $cloudProviderImagePullSecretName := include "infra-sanity-service.cloudProviderImagePullSecretName" . -}}
-{{- $imageTag := include "infra-sanity-service.tag" . -}}
+{{- $chartName := include "checkmate.name" . -}}
+{{- $cloudProviderFlavor := include "checkmate.cloudProviderFlavor" . -}}
+{{- $cloudProviderDockerRegistryUrl := include "checkmate.cloudProviderDockerRegistryUrl" . -}}
+{{- $cloudProviderImagePullSecretName := include "checkmate.cloudProviderImagePullSecretName" . -}}
+{{- $imageTag := include "checkmate.tag" . -}}
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ printf "%s-deployment" (include "infra-sanity-service.fullname" .) }}
+  name: {{ printf "%s-deployment" (include "checkmate.fullname" .) }}
   labels:
     app: {{ $chartName }}
     component: {{ $chartName }}
-    environment: {{ include "infra-sanity-service.environment" . }}
     release: {{ $releaseName }}
-    {{- include "infra-sanity-service.labels" . | nindent 4 }}
+    {{- include "checkmate.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
@@ -23,15 +22,16 @@ spec:
       app: {{ $chartName }}
       release: {{ $releaseName }}
       run: {{ $releaseName }}-{{ $chartName }}
-      {{- include "infra-sanity-service.selectorLabels" . | nindent 6 }}
+      {{- include "checkmate.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         app: {{ $chartName }}
         release: {{ $releaseName }}
         run: {{ $releaseName }}-{{ $chartName }}
-        {{- include "infra-sanity-service.labels" . | nindent 8 }}
+        {{- include "checkmate.labels" . | nindent 8 }}
       annotations:
+        {{ include "mc-labels-and-annotations.annotations" . | nindent 8 }}
       {{- if .Values.resetOnConfigChange }}
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       {{- end }}
@@ -81,7 +81,7 @@ spec:
             {{- end }}            
           envFrom:
             - configMapRef:
-                name: {{ printf "%s-configmap" (include "infra-sanity-service.fullname" .) }}
+                name: {{ printf "%s-configmap" (include "checkmate.fullname" .) }}
           ports:
             - name: http
               containerPort: {{ .Values.env.targetPort }}
